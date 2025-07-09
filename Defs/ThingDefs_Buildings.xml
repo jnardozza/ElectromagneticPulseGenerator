@@ -41,6 +41,7 @@
       <WorkToBuild>12000</WorkToBuild>
       <Flammability>0.5</Flammability>
       <Beauty>-8</Beauty>
+      <Mass>60</Mass>
     </statBases>
     <hasInteractionCell>true</hasInteractionCell>
     <interactionCellOffset>(0,0,2)</interactionCellOffset>
@@ -65,6 +66,9 @@
     </researchPrerequisites>
     <constructionSkillPrerequisite>8</constructionSkillPrerequisite>
     <tickerType>Normal</tickerType>
-    <minifiable>true</minifiable>
+    <minifiedDef>MinifiedThing</minifiedDef>
+    <thingCategories>
+      <li>BuildingsMisc</li>
+    </thingCategories>
   </ThingDef>
 </Defs>

@@ -4,7 +4,6 @@
     <defName>ScanForOreDeposit</defName>
     <driverClass>ElectromagneticPulseGenerator.JobDriver_ScanForOreDeposit</driverClass>
     <reportString>scanning for ore deposits</reportString>
-    <workGiver>ScanForOreDeposit</workGiver>
     <playerInterruptible>true</playerInterruptible>
     <casualInterruptible>true</casualInterruptible>
     <alwaysShowWeapon>false</alwaysShowWeapon>
@@ -22,9 +21,7 @@
     </requiredCapacities>
     <workTags>None</workTags>
     <directOrderable>true</directOrderable>
-    <priority>9</priority>
     <scanThings>true</scanThings>
     <scanCells>false</scanCells>
-    <jobDef>ScanForOreDeposit</jobDef>
   </WorkGiverDef>
 </Defs>

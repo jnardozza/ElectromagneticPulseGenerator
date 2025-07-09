@@ -10,26 +10,35 @@ namespace ElectromagneticPulseGenerator
         private Building_ElectromagneticPulseGenerator EPG => (Building_ElectromagneticPulseGenerator)job.targetA.Thing;
         private CompEPGScanner ScannerComp => EPG?.GetComp<CompEPGScanner>();
 
-        public override bool TryMakePreToilReservations(bool errorOnFailed) => true;
+        public override bool TryMakePreToilReservations(bool errorOnFailed)
+        {
+            return pawn.Reserve(job.targetA, job, 1, -1, null, errorOnFailed);
+        }
 
         protected override IEnumerable<Toil> MakeNewToils()
         {
             this.FailOnDespawnedNullOrForbidden(TargetIndex.A);
             this.FailOnBurningImmobile(TargetIndex.A);
+            // Only allow if scanner can be used (add a CanUseNow property if needed)
+            this.FailOn(() => ScannerComp == null);
+            this.FailOn(() => !pawn.CanReserveAndReach(job.targetA, PathEndMode.InteractionCell, Danger.Some));
             yield return Toils_Goto.GotoThing(TargetIndex.A, PathEndMode.InteractionCell);
 
-            var scan = new Toil();
-            scan.initAction = () => scan.actor.pather.StopDead();
+            var scan = ToilMaker.MakeToil("ScanForOreDeposit");
             scan.tickAction = () =>
             {
-                scan.actor.skills?.Learn(SkillDefOf.Intellectual, 0.11f);
-                scan.actor.GainComfortFromCellIfPossible();
-                ScannerComp?.AddProgress(1); // Add 1 work per tick
+                Pawn actor = scan.actor;
+                ScannerComp?.AddProgress(1);
+                actor.skills?.Learn(SkillDefOf.Intellectual, 0.11f);
+                actor.GainComfortFromCellIfPossible();
             };
-            scan.defaultCompleteMode = ToilCompleteMode.Never;
-            // Progress bar: show progress toward guaranteed find
-            scan.WithProgressBar(TargetIndex.A, () => ScannerComp != null ? (float)ScannerComp.GetScanProgress() : 0f);
+            scan.defaultCompleteMode = ToilCompleteMode.Delay;
+            scan.defaultDuration = 4000; // Same as vanilla research
+            scan.FailOnCannotTouch(TargetIndex.A, PathEndMode.InteractionCell);
             scan.activeSkill = () => SkillDefOf.Intellectual;
+            scan.WithProgressBar(TargetIndex.A, () => ScannerComp != null ? ScannerComp.GetScanProgress() : 0f);
+            // Optionally: add a sound or effect here
+            // Remove explicit fail for hunger/rest; let AI handle interruptions
             yield return scan;
         }
     }

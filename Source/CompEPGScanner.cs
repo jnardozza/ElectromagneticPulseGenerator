@@ -11,6 +11,12 @@ namespace ElectromagneticPulseGenerator
         private int scanTicks = 0;
         private Building_ElectromagneticPulseGenerator EPG => parent as Building_ElectromagneticPulseGenerator;
 
+        public override void PostExposeData()
+        {
+            base.PostExposeData();
+            Scribe_Values.Look(ref scanTicks, "scanTicks", 0);
+        }
+
         public float GetScanProgress()
         {
             return (float)scanTicks / (float)Props.maxScanTimeTicks;

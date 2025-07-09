@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace ElectromagneticPulseGenerator
 {
-    public class Building_ElectromagneticPulseGenerator : Building
+    public class Building_ElectromagneticPulseGenerator : Building, IExposable
     {
         private CompPowerTrader powerComp;
         private List<IntVec3> oreCells = new List<IntVec3>();
@@ -19,10 +19,30 @@ namespace ElectromagneticPulseGenerator
         private bool scanned = false;
         private bool autoMineEnabled = false;
 
+        // For save/load
+        public override void ExposeData()
+        {
+            base.ExposeData();
+            Scribe_Values.Look<bool>(ref scanned, "scanned", false);
+            Scribe_Values.Look<bool>(ref autoMineEnabled, "autoMineEnabled", false);
+
+            // Save revealed and unrevealed deposits as lists of cell lists
+            Scribe_Collections.Look(ref revealedDeposits, "revealedDeposits", LookMode.Value);
+            Scribe_Collections.Look(ref unrevealedDeposits, "unrevealedDeposits", LookMode.Value);
+        }
+
         public override void SpawnSetup(Map map, bool respawningAfterLoad)
         {
             base.SpawnSetup(map, respawningAfterLoad);
             powerComp = GetComp<CompPowerTrader>();
+
+            // After loading, if deposits are present, reconstruct oreDeposits
+            if (revealedDeposits.Count + unrevealedDeposits.Count > 0)
+            {
+                oreDeposits.Clear();
+                oreDeposits.AddRange(revealedDeposits);
+                oreDeposits.AddRange(unrevealedDeposits);
+            }
         }
 
         public override void Tick()
