@@ -219,11 +219,11 @@ namespace ElectromagneticPulseGenerator
             {
                 defaultLabel = "Auto-mine revealed deposits",
                 defaultDesc = "When enabled, newly revealed deposits and a mine shaft will be automatically designated for mining.",
+                icon = ContentFinder<Texture2D>.Get("UI/Auto_Mine_Icon", true),
                 isActive = () => autoMineEnabled,
                 toggleAction = () => autoMineEnabled = !autoMineEnabled
             };
-#if DEBUG
-            if (Prefs.DevMode)
+            if (DebugSettings.godMode)
             {
                 yield return new Command_Action
                 {
@@ -238,7 +238,6 @@ namespace ElectromagneticPulseGenerator
                     action = () => { while (RevealRandomOreDeposit(Map)) { } }
                 };
             }
-#endif
         }
     }
 }
