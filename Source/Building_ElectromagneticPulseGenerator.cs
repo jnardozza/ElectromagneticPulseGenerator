@@ -45,7 +45,7 @@ namespace ElectromagneticPulseGenerator
             }
         }
 
-        public override void Tick()
+        protected override void Tick()
         {
             base.Tick();
             if (!scanned && powerComp != null && powerComp.PowerOn)

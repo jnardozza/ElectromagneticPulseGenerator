@@ -30,7 +30,7 @@ namespace ElectromagneticPulseGenerator
                 Pawn actor = scan.actor;
                 ScannerComp?.AddProgress(1);
                 actor.skills?.Learn(SkillDefOf.Intellectual, 0.11f);
-                actor.GainComfortFromCellIfPossible();
+                PawnUtility.GainComfortFromCellIfPossible(actor, 1, false);
             };
             scan.defaultCompleteMode = ToilCompleteMode.Delay;
             scan.defaultDuration = 4000; // Same as vanilla research
