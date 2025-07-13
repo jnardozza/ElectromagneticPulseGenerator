@@ -9,6 +9,9 @@ namespace ElectromagneticPulseGenerator
 {
     public class Building_ElectromagneticPulseGenerator : Building, IExposable
     {
+        // For incremental scanning
+        private int scanIndex = 0;
+        private int scanCooldown = 0;
         private CompPowerTrader powerComp;
         private List<IntVec3> oreCells = new List<IntVec3>();
         private List<IntVec3> revealedOreCells = new List<IntVec3>();
@@ -52,6 +55,60 @@ namespace ElectromagneticPulseGenerator
             {
                 ScanForOres(Map);
                 scanned = true;
+            }
+            // Incremental rescan for new deposits
+            if (powerComp != null && powerComp.PowerOn)
+            {
+                if (scanCooldown > 0)
+                {
+                    scanCooldown--;
+                }
+                else
+                {
+                    IncrementalScanForOres(Map);
+                }
+            }
+        }
+
+        // Incremental scan for new deposits (scans 100 things per tick)
+        private void IncrementalScanForOres(Map map)
+        {
+            var allThings = map.listerThings.AllThings;
+            int batchSize = 100;
+            HashSet<IntVec3> visited = new HashSet<IntVec3>();
+            if (scanIndex == 0)
+            {
+                oreCells.Clear();
+                revealedOreCells.Clear();
+                unrevealedOreCells.Clear();
+                oreDeposits.Clear();
+                revealedDeposits.Clear();
+                unrevealedDeposits.Clear();
+            }
+            int end = Mathf.Min(scanIndex + batchSize, allThings.Count);
+            for (int i = scanIndex; i < end; i++)
+            {
+                var thing = allThings[i];
+                if (thing is Mineable && IsOre(thing.def))
+                {
+                    IntVec3 pos = thing.Position;
+                    if (!visited.Contains(pos))
+                    {
+                        List<IntVec3> deposit = new List<IntVec3>();
+                        FloodFillOre(map, pos, thing.def, visited, deposit);
+                        if (deposit.Count > 0)
+                        {
+                            oreDeposits.Add(deposit);
+                            unrevealedDeposits.Add(deposit);
+                        }
+                    }
+                }
+            }
+            scanIndex = end;
+            if (scanIndex >= allThings.Count)
+            {
+                scanIndex = 0;
+                scanCooldown = 5000; // Wait 5000 ticks before next scan
             }
         }
 
@@ -119,6 +176,8 @@ namespace ElectromagneticPulseGenerator
         // Reveal a random unrevealed deposit
         public bool RevealRandomOreDeposit(Map map)
         {
+            // Remove any deposits that have been fully mined before revealing
+            RemoveMinedDeposits(map);
             if (unrevealedDeposits.Count == 0) return false;
             int idx = Rand.Range(0, unrevealedDeposits.Count);
             var deposit = unrevealedDeposits[idx];
@@ -133,7 +192,10 @@ namespace ElectromagneticPulseGenerator
             }
             // Center camera on the first cell of the deposit
             IntVec3 centerCell = deposit[0];
-            Messages.Message("A new ore deposit has been revealed!", new TargetInfo(centerCell, map), MessageTypeDefOf.PositiveEvent);
+            // Get ore type from the first cell
+            Mineable oreThing = map.thingGrid.ThingAt<Mineable>(centerCell);
+            string oreLabel = oreThing?.def?.label ?? "ore";
+            Messages.Message($"A new {oreLabel} deposit has been revealed!", new TargetInfo(centerCell, map), MessageTypeDefOf.PositiveEvent);
             if (autoMineEnabled)
             {
                 DesignateDepositAndMineShaft(map, deposit);
@@ -202,11 +264,23 @@ namespace ElectromagneticPulseGenerator
             base.DrawExtraSelectionOverlays();
             if (powerComp != null && powerComp.PowerOn && revealedDeposits.Count > 0)
             {
+                // Only draw overlays for deposits that still have ore
                 foreach (var deposit in revealedDeposits)
                 {
-                    GenDraw.DrawFieldEdges(deposit, Color.green);
+                    if (deposit.Any(cell => Map.thingGrid.ThingAt<Mineable>(cell) != null))
+                    {
+                        GenDraw.DrawFieldEdges(deposit, Color.green);
+                    }
                 }
             }
+        }
+        // Remove deposits that have been fully mined from all lists
+        private void RemoveMinedDeposits(Map map)
+        {
+            bool HasOre(List<IntVec3> deposit) => deposit.Any(cell => map.thingGrid.ThingAt<Mineable>(cell) != null);
+            oreDeposits.RemoveAll(d => !HasOre(d));
+            revealedDeposits.RemoveAll(d => !HasOre(d));
+            unrevealedDeposits.RemoveAll(d => !HasOre(d));
         }
 
         public new CompPowerTrader PowerComp => powerComp;
