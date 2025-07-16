@@ -35,7 +35,7 @@
       <li Class="ElectromagneticPulseGenerator.CompProperties_EPGScanner" />
     </comps>
     <altitudeLayer>Building</altitudeLayer>
-    <canBeUsedUnderRoof>false</canBeUsedUnderRoof>
+    <canBeUsedUnderRoof>true</canBeUsedUnderRoof>
     <statBases>
       <MaxHitPoints>200</MaxHitPoints>
       <WorkToBuild>12000</WorkToBuild>
@@ -57,7 +57,6 @@
     <size>(3,3)</size>
     <terrainAffordanceNeeded>Heavy</terrainAffordanceNeeded>
     <placeWorkers>
-      <li>PlaceWorker_NotUnderRoof</li>
       <li>PlaceWorker_PreventInteractionSpotOverlap</li>
     </placeWorkers>
     <defaultPlacingRot>South</defaultPlacingRot>
