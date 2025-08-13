@@ -28,9 +28,10 @@ namespace ElectromagneticPulseGenerator
             scan.tickAction = () =>
             {
                 Pawn actor = scan.actor;
+                // Small manning bonus: +1 extra per tick (on top of comp's +1)
                 ScannerComp?.AddProgress(1);
                 actor.skills?.Learn(SkillDefOf.Intellectual, 0.11f);
-                PawnUtility.GainComfortFromCellIfPossible(actor, 1, false);
+                PawnUtility.GainComfortFromCellIfPossible(actor, true);
             };
             scan.defaultCompleteMode = ToilCompleteMode.Delay;
             scan.defaultDuration = 4000; // Same as vanilla research

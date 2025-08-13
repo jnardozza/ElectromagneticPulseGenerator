@@ -1,10 +1,10 @@
 <ModMetaData>
   <packageId>xannihilusx.electromagneticpulsegenerator</packageId>
-  <name>Electromagnetic Pulse Generator</name>
+  <name>Electromagnetic Pulse Scanner</name>
   <author>xannihilusx</author>
   <url></url>
   <description>
-    Adds the Electromagnetic Pulse Generator structure. When powered, it scans the map for hidden ore deposits and allows you to reveal them. Optionally, it can automatically designate revealed deposits and a mineshaft corridor for mining, making resource extraction easier and more efficient.
+    Adds the Electromagnetic Pulse Scanner structure. When powered, it scans the map for hidden ore deposits and allows you to reveal them. Optionally, it can automatically designate revealed deposits and a mineshaft corridor for mining, making resource extraction easier and more efficient.
   </description>
   <supportedVersions>
     <li>1.5</li>

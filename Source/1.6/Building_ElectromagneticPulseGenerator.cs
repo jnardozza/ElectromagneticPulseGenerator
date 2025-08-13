@@ -289,6 +289,14 @@ namespace ElectromagneticPulseGenerator
         public override IEnumerable<Gizmo> GetGizmos()
         {
             foreach (var g in base.GetGizmos()) yield return g;
+
+            // Visual progress indicator gizmo
+            var scannerComp = GetComp<CompEPGScanner>();
+            if (scannerComp != null)
+            {
+                yield return new Gizmo_ScanProgress(this);
+            }
+
             yield return new Command_Toggle
             {
                 defaultLabel = "Auto-mine revealed deposits",

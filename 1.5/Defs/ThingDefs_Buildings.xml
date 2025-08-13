@@ -3,7 +3,7 @@
   <ThingDef ParentName="BuildingBase">
     <thingClass>ElectromagneticPulseGenerator.Building_ElectromagneticPulseGenerator</thingClass>
     <defName>ElectromagneticPulseGenerator</defName>
-    <label>electromagnetic pulse generator</label>
+  <label>electromagnetic pulse scanner</label>
     <description>A high-tech structure that, when powered and operated by a colonist, reveals mineral deposits on the map one at a time.</description>
     <graphicData>
       <texPath>Things/Building/ElectromagneticPulseGenerator</texPath>
@@ -32,7 +32,10 @@
       </li>
       <li Class="CompProperties_Breakdownable"/>
       <li Class="CompProperties_Flickable"/>
-      <li Class="ElectromagneticPulseGenerator.CompProperties_EPGScanner" />
+      <li Class="ElectromagneticPulseGenerator.CompProperties_EPGScanner">
+        <meanTimeBetweenFindsDays>0.5</meanTimeBetweenFindsDays>
+        <maxScanTimeTicks>45000</maxScanTimeTicks>
+      </li>
     </comps>
     <altitudeLayer>Building</altitudeLayer>
     <canBeUsedUnderRoof>false</canBeUsedUnderRoof>

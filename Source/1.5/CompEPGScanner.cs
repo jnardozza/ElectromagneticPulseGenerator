@@ -2,6 +2,7 @@ using RimWorld;
 using Verse;
 using Verse.AI;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace ElectromagneticPulseGenerator
 {
@@ -22,9 +23,12 @@ namespace ElectromagneticPulseGenerator
             return (float)scanTicks / (float)Props.maxScanTimeTicks;
         }
 
-        public override void CompTickRare()
+        public override void CompTick()
         {
-            base.CompTickRare();
+            base.CompTick();
+            if (!parent.Spawned) return;
+            // Run at a rare cadence to keep perf low
+            if (!parent.IsHashIntervalTick(250)) return;
             // Only add automatic progress if powered
             var power = parent.TryGetComp<CompPowerTrader>();
             if (power != null && power.PowerOn)
@@ -43,6 +47,19 @@ namespace ElectromagneticPulseGenerator
                 scanTicks = 0;
                 EPG?.RevealRandomOreDeposit(EPG.Map);
             }
+        }
+
+        public override string CompInspectStringExtra()
+        {
+            var power = parent.TryGetComp<CompPowerTrader>();
+            if (power != null && !power.PowerOn)
+            {
+                return "Scanner: Unpowered";
+            }
+            float progress = Mathf.Clamp01((float)scanTicks / (float)Props.maxScanTimeTicks);
+            int remainingTicks = Mathf.Max(Props.maxScanTimeTicks - scanTicks, 0);
+            float remainingDays = remainingTicks / 60000f;
+            return $"Next guaranteed find: {progress:P0} ({remainingDays:0.0} days)";
         }
     }
 }
